@@ -230,4 +230,14 @@ public class Board {
             }
         }
     }
+
+    public void refreshBoard() {
+        for (int i=0; i<Game.NUM_SQUARES; i++) {
+            for (int j=0; j<Game.NUM_SQUARES; j++) {
+                Piece piece = new Piece();
+                grid[i][j] = piece;
+                gridpane.add(piece.square, j, i);
+            }
+        }
+    }
 }

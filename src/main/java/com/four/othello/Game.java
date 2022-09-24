@@ -32,15 +32,19 @@ public class Game extends Application {
         StackPane mainpane = new StackPane();
         mainpane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
 
-        VBox textbox = new VBox();
-        textbox.setAlignment(Pos.CENTER);
-
         Text endTitle = new Text();
         endTitle.setText("END GAME");
         endTitle.setFont(Font.font("Verdana", FontWeight.BOLD, 70));
         endTitle.setFill(Color.WHITE);
 
+        VBox textbox = new VBox();
+        textbox.setAlignment(Pos.CENTER);
+        Text whiteScore = new Text();
+        Text blackScore = new Text();
+
         textbox.getChildren().add(endTitle);
+        textbox.getChildren().add(whiteScore);
+        textbox.getChildren().add(blackScore);
 
         Player black = new Player(Color.BLACK);
         Player white = new Player(Color.WHITE);
@@ -49,7 +53,6 @@ public class Game extends Application {
         players[1] = white;
 
         setup();
-        board.highlightPossibleMoves(black);
 
         mainpane.getChildren().add(board.gridpane);
 
@@ -58,11 +61,21 @@ public class Game extends Application {
         stage.setScene(scene);
         stage.show();
 
-        board.gridpane.setOnMouseClicked(e -> {
-            if (endgame == true) {
+        mainpane.setOnMouseClicked(e -> {
+            if (this.endgame) {
+                System.out.println("endgame true");
+                mainpane.getChildren().remove(textbox);
+                board.gridpane.setOpacity(1);
+                board.refreshBoard();
+                black.score = 0;
+                white.score = 0;
+
                 setup();
-                endgame = false;
+
+                this.endgame = false;
+                currentPlayerBlack = true;
             } else {
+                System.out.println("endgame false");
                 int col = (int) Math.round(e.getX()) / SQUARE_SIZE;
                 int row = (int) Math.round(e.getY()) / SQUARE_SIZE;
 
@@ -86,23 +99,19 @@ public class Game extends Application {
                     if (!hasMoves) {
                         hasMoves = board.highlightPossibleMoves(currentPlayer);
                         if (!hasMoves) {
+                            this.endgame = true;
                             board.getScore(players);
 
-                            Text whiteScore = new Text();
                             whiteScore.setText("WHITE: " + white.score);
                             whiteScore.setFont(Font.font("Verdana", FontWeight.BOLD, 30));
                             whiteScore.setFill(Color.WHITE);
-                            Text blackScore = new Text();
+
                             blackScore.setText("BLACK: " + black.score);
                             blackScore.setFont(Font.font("Verdana", FontWeight.BOLD, 30));
                             blackScore.setFill(Color.WHITE);
 
-                            textbox.getChildren().add(whiteScore);
-                            textbox.getChildren().add(blackScore);
-
                             board.gridpane.setOpacity(0.5);
                             mainpane.getChildren().add(textbox);
-                            endgame = true;
                         }
                     }
                     else {
@@ -125,6 +134,8 @@ public class Game extends Application {
         board.updatePiece(4, 4, black);
         board.updatePiece(3, 4, white);
         board.updatePiece(4, 3, white);
+
+        board.highlightPossibleMoves(black);
     }
 
     public static void main(String[] args) {
