@@ -7,7 +7,7 @@ import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
 
-public class Board {
+public class Board implements Cloneable {
     GridPane gridpane = new GridPane();
     Piece[][] grid = new Piece[Game.NUM_SQUARES][Game.NUM_SQUARES];
 
@@ -106,12 +106,7 @@ public class Board {
         ArrayList<Piece> possibleMoves = findPossibleMoves(player);
 
         // reset background colour
-        for (int row=0; row<Game.NUM_SQUARES; row++) {
-            for (int col=0; col<Game.NUM_SQUARES; col++) {
-                Piece piece = grid[row][col];
-                piece.square.setBackground(new Background(new BackgroundFill(Color.MEDIUMSEAGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
-            }
-        }
+        resetBackgroundColour();
 
         if (possibleMoves.size() == 0) {
             return false;
@@ -123,6 +118,30 @@ public class Board {
         }
 
         return true;
+    }
+
+    public void resetBackgroundColour() {
+        for (int row=0; row<Game.NUM_SQUARES; row++) {
+            for (int col=0; col<Game.NUM_SQUARES; col++) {
+                Piece piece = grid[row][col];
+                piece.square.setBackground(new Background(new BackgroundFill(Color.MEDIUMSEAGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+            }
+        }
+    }
+
+    public int[] getIndex(Piece piece) {
+        int[] positions = new int[2];
+
+        for (int i=0; i<Game.NUM_SQUARES; i++) {
+            for (int j=0; j<Game.NUM_SQUARES; j++) {
+                if (piece == grid[i][j]) {
+                    positions[0] = i;
+                    positions[1] = j;
+                }
+            }
+        }
+
+        return positions;
     }
 
     public boolean checkIfPossible(int row, int col, Player player) {
@@ -215,6 +234,27 @@ public class Board {
         piece.square.getChildren().add(circle);
     }
 
+    public void updatePiece(Piece piece, Player player) {
+        piece.empty = false;
+        piece.occupiedBy = player;
+        Circle circle = new Circle();
+        circle.setRadius(Game.SQUARE_SIZE/2 - 10);
+        circle.setFill(player.colour);
+        piece.square.getChildren().add(circle);
+    }
+
+    public void emptyPiece(Piece piece) {
+        for (int i=0; i<Game.NUM_SQUARES; i++) {
+            for (int j=0; j<Game.NUM_SQUARES; j++) {
+                if (grid[i][j] == piece) {
+                    piece.empty = true;
+                    piece.occupiedBy = null;
+                    piece.square.getChildren().clear();
+                }
+            }
+        }
+    }
+
     public void getScore(Player[] players) {
         Player black = players[0];
         Player white = players[1];
@@ -239,5 +279,9 @@ public class Board {
                 gridpane.add(piece.square, j, i);
             }
         }
+    }
+
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

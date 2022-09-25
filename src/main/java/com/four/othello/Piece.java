@@ -4,8 +4,6 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-import java.util.Stack;
-
 public class Piece {
     boolean empty = true;
 
