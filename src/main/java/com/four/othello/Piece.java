@@ -10,6 +10,8 @@ public class Piece {
     StackPane square = new StackPane();
     Player occupiedBy;
 
+    int score;
+
     Piece() {
         square.setBackground(new Background(new BackgroundFill(Color.MEDIUMSEAGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
         square.setPrefSize(Game.SQUARE_SIZE, Game.SQUARE_SIZE);

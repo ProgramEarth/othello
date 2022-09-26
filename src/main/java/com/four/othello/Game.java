@@ -89,7 +89,9 @@ public class Game extends Application {
                             // wait 2s
                             ArrayList<Piece> hasMoves = board.findPossibleMoves(ai_player.player);
                             while (!hasMoves.isEmpty()) {
-                                int[] move = ai_player.miniMax(board);
+//                                int[] move = ai_player.greedyAlgorithm(board);
+                                Piece piece = ai_player.minimax(board, 4, ai_player.player, human_player, ai_player.player, human_player);
+                                int[] move = board.getIndex(piece);
                                 int row = move[0];
                                 int col = move[1];
 
@@ -105,22 +107,29 @@ public class Game extends Application {
                                     hasMoves = board.findPossibleMoves(ai_player.player);
                                 }
                             }
-                            if (hasMoves.isEmpty()) {
-                                endgame = true;
-                                // reset square background colour
-                                board.resetBackgroundColour();
-                                board.getScore(players);
+                            while (hasMoves.isEmpty()) {
+                                ArrayList<Piece> humanHasMoves = board.findPossibleMoves(human_player);
+                                if (!humanHasMoves.isEmpty()) {
+                                    board.highlightPossibleMoves(human_player);
+                                    break;
+                                } else {
+                                    endgame = true;
+                                    // reset square background colour
+                                    board.resetBackgroundColour();
+                                    board.getScore(players);
 
-                                whiteScore.setText("WHITE: " + white.score);
-                                whiteScore.setFont(Font.font("Verdana", FontWeight.BOLD, 30));
-                                whiteScore.setFill(Color.WHITE);
+                                    whiteScore.setText("WHITE: " + white.score);
+                                    whiteScore.setFont(Font.font("Verdana", FontWeight.BOLD, 30));
+                                    whiteScore.setFill(Color.WHITE);
 
-                                blackScore.setText("BLACK: " + black.score);
-                                blackScore.setFont(Font.font("Verdana", FontWeight.BOLD, 30));
-                                blackScore.setFill(Color.WHITE);
+                                    blackScore.setText("BLACK: " + black.score);
+                                    blackScore.setFont(Font.font("Verdana", FontWeight.BOLD, 30));
+                                    blackScore.setFill(Color.WHITE);
 
-                                board.gridpane.setOpacity(0.5);
-                                mainpane.getChildren().add(textbox);
+                                    board.gridpane.setOpacity(0.5);
+                                    mainpane.getChildren().add(textbox);
+                                    break;
+                                }
                             }
                         }
                     }));

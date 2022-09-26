@@ -7,7 +7,7 @@ import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
 
-public class Board implements Cloneable {
+public class Board {
     GridPane gridpane = new GridPane();
     Piece[][] grid = new Piece[Game.NUM_SQUARES][Game.NUM_SQUARES];
 
