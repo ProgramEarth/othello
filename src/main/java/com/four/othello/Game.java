@@ -15,6 +15,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.util.Pair;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -90,10 +91,19 @@ public class Game extends Application {
                             ArrayList<Piece> hasMoves = board.findPossibleMoves(ai_player.player);
                             while (!hasMoves.isEmpty()) {
 //                                int[] move = ai_player.greedyAlgorithm(board);
-                                Piece piece = ai_player.minimax(board, 4, ai_player.player, human_player, ai_player.player, human_player);
+                                Piece piece;
+                                Pair<Piece, Integer> pair;
+                                pair = ai_player.minimax(board, 4, ai_player.player, human_player, ai_player.player, human_player);
+                                piece = pair.getKey();
+                                int[] pos = board.getIndex(piece);
+                                piece = board.grid[pos[0]][pos[1]];
+                                if (!hasMoves.contains(piece)) {
+                                    System.out.println("illegal move chosen by AI");
+                                }
                                 int[] move = board.getIndex(piece);
                                 int row = move[0];
                                 int col = move[1];
+                                System.out.println("final move: " + row + " " + col);
 
                                 board.updatePiece(row, col, ai_player.player);
                                 board.flipPieces(row, col, ai_player.player);
@@ -111,7 +121,6 @@ public class Game extends Application {
                                 ArrayList<Piece> humanHasMoves = board.findPossibleMoves(human_player);
                                 if (!humanHasMoves.isEmpty()) {
                                     board.highlightPossibleMoves(human_player);
-                                    break;
                                 } else {
                                     endgame = true;
                                     // reset square background colour
@@ -128,8 +137,8 @@ public class Game extends Application {
 
                                     board.gridpane.setOpacity(0.5);
                                     mainpane.getChildren().add(textbox);
-                                    break;
                                 }
+                                break;
                             }
                         }
                     }));

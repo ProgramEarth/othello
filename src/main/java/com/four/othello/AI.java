@@ -1,5 +1,8 @@
 package com.four.othello;
 
+import javafx.util.Pair;
+
+import java.io.*;
 import java.util.ArrayList;
 
 public class AI {
@@ -37,65 +40,91 @@ public class AI {
     }
 
     // minimax algorithm, looking n moves ahead
-    public Piece minimax(Board board, int n, Player ai_player, Player human_player, Player currPlayer, Player otherPlayer) {
+    public Pair<Piece, Integer> minimax(Board board, int n, Player ai_player, Player human_player, Player currPlayer, Player otherPlayer) {
         ArrayList<Piece> possibleMoves = board.findPossibleMoves(currPlayer);
+        for (Piece move : possibleMoves) {
+            if (move == board.grid[0][0]) {
+                System.out.println("corner is a possible move");
+            }
+        }
 
-        Piece outputPiece = new Piece();
-        int max_score = 0;
+        Piece outputPiece;
+        int[] outputPos = new int[2];
+        int outputScore = 0;
+        int max_score = -10000;
+        int min_score = 10000;
         int next_n = n-1;
-
-        System.out.println(next_n);
 
         // bottom of search tree
         if (possibleMoves.isEmpty()) {
-            possibleMoves = board.findPossibleMoves(otherPlayer);
-            if (possibleMoves.isEmpty()) {
+            ArrayList<Piece> nextMoves = board.findPossibleMoves(otherPlayer);
+            if (nextMoves.isEmpty()) {
                 int score = evaluateBoard(board, otherPlayer);
-                Piece dummyPiece = new Piece();
-                dummyPiece.score = score;
-                return dummyPiece;
+                outputPiece = new Piece();
+                return new Pair(outputPiece, score);
             }
         }
 
         if (next_n <= 0) {
             // incentivised to maximise its own score
             for (Piece move : possibleMoves) {
+                Board tempBoard = new Board(board);
                 // make move
-                board.updatePiece(move, currPlayer);
-                int score = evaluateBoard(board, currPlayer);
-                if (score > max_score) {
-                    outputPiece = move;
-                    max_score = score;
-                }
-
-                board.emptyPiece(move);
-            }
-
-            // return the move with the maximum score
-            outputPiece.score = max_score;
-            return outputPiece;
-        } else {
-            Piece tempPiece;
-
-            for (Piece move : possibleMoves) {
-                board.updatePiece(move, currPlayer);
-
-                if (currPlayer == human_player) {
-                    tempPiece = minimax(board, next_n, ai_player, human_player, ai_player, human_player);
+                int[] position = board.getIndex(move);
+                int row = position[0];
+                int col = position[1];
+                System.out.println("move: " + row + " " + col);
+                tempBoard.updatePiece(row, col, currPlayer);
+                tempBoard.flipPieces(row, col, currPlayer);
+                int score = evaluateBoard(tempBoard, ai_player) - evaluateBoard(tempBoard, human_player);
+                if (currPlayer == ai_player) {
+                    if (score > max_score) {
+                        outputPos = position;
+                        max_score = score;
+                        outputScore = score;
+                    }
                 } else {
-                    tempPiece = minimax(board, next_n, ai_player, human_player, human_player, ai_player);
+                    if (score < min_score) {
+                        outputPos = position;
+                        min_score = score;
+                        outputScore = score;
+                    }
                 }
-
-                if (tempPiece.score > max_score) {
-                    max_score = tempPiece.score;
-                    outputPiece = move;
-                }
-                board.emptyPiece(move);
             }
+        } else {
+            for (Piece move : possibleMoves) {
+                Board tempBoard = new Board(board);
+                int[] position = board.getIndex(move);
+                int row = position[0];
+                int col = position[1];
+                System.out.println("move: " + row + " " + col);
+                tempBoard.updatePiece(row, col, currPlayer);
+                tempBoard.flipPieces(row, col, currPlayer);
 
-            outputPiece.score = max_score;
-            return outputPiece;
+                if (currPlayer == ai_player) {
+                    Pair<Piece, Integer> tempPair = minimax(tempBoard, next_n, ai_player, human_player, human_player, ai_player);
+                    if (tempPair.getValue() > max_score) {
+                        outputPos = position;
+                        max_score = tempPair.getValue();
+                        outputScore = tempPair.getValue();
+                    }
+                } else {
+                    Pair<Piece, Integer> tempPair = minimax(tempBoard, next_n, ai_player, human_player, ai_player, human_player);
+                    if (tempPair.getValue() < min_score) {
+                        outputPos = position;
+                        min_score = tempPair.getValue();
+                        outputScore = tempPair.getValue();
+                    }
+                }
+            }
         }
+
+        int row = outputPos[0];
+        int col = outputPos[1];
+        System.out.println(row + " " + col);
+        outputPiece = board.grid[row][col];
+
+        return new Pair(outputPiece, outputScore);
     }
 
     // calculate a score based on the state of the board

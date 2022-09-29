@@ -5,6 +5,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
+import java.io.*;
 import java.util.ArrayList;
 
 public class Board {
@@ -17,6 +18,16 @@ public class Board {
                 Piece piece = new Piece();
                 grid[i][j] = piece;
                 gridpane.add(piece.square, j, i);
+            }
+        }
+    }
+
+    public Board(Board original) {
+        this.gridpane = original.gridpane;
+        for (int i=0; i<Game.NUM_SQUARES; i++) {
+            for (int j=0; j<Game.NUM_SQUARES; j++) {
+                Piece originalPiece = original.grid[i][j];
+                this.grid[i][j] = new Piece(originalPiece);
             }
         }
     }
@@ -249,6 +260,7 @@ public class Board {
                 if (grid[i][j] == piece) {
                     piece.empty = true;
                     piece.occupiedBy = null;
+                    piece.score = 0;
                     piece.square.getChildren().clear();
                 }
             }
@@ -279,9 +291,5 @@ public class Board {
                 gridpane.add(piece.square, j, i);
             }
         }
-    }
-
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
     }
 }

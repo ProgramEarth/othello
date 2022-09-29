@@ -17,4 +17,14 @@ public class Piece {
         square.setPrefSize(Game.SQUARE_SIZE, Game.SQUARE_SIZE);
         square.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
     }
+
+    Piece(Piece originalPiece) {
+        this.empty = originalPiece.empty;
+        this.square = new StackPane();
+        this.square.setBackground(new Background(new BackgroundFill(Color.MEDIUMSEAGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+        this.square.setPrefSize(Game.SQUARE_SIZE, Game.SQUARE_SIZE);
+        this.square.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        this.occupiedBy = originalPiece.occupiedBy;
+        this.score = originalPiece.score;
+    }
 }
